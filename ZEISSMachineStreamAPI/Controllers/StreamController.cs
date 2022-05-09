@@ -6,15 +6,21 @@ using System.Text;
 
 namespace ZEISSMachineStreamAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class StreamController : ControllerBase
     {
-        [HttpGet("/machinestream")]
-        public async Task<StreamResult> Get()
+        [HttpGet]
+        public async Task<ActionResult<StreamResult>> Get()
         {
+            try
+            {
                 using var webSocket = new ClientWebSocket();
-                 return await Echo(webSocket);
+                return await Echo(webSocket);
+            }catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
 
@@ -31,7 +37,7 @@ namespace ZEISSMachineStreamAPI.Controllers
 
 
             await webSocket.CloseAsync(
-                receiveResult.CloseStatus.Value,
+                WebSocketCloseStatus.NormalClosure,
                 receiveResult.CloseStatusDescription,
                 CancellationToken.None);
 
